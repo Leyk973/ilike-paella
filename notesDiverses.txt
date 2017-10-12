@@ -1,0 +1,4 @@
+12/10/17
+Windows est moyen niveau multihtreading 
+Il répartit les threads de manière totalopif et donc ça fait des trucs bizarres sur la courbe
+On va tester sur les machines de la fac, voir si on arrive à compiler déjà

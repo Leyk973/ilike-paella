@@ -89,7 +89,6 @@ void * threadMean (void* arg)
 
     for (i = 1; i <= struData->tabSize; ++i)
     {
-        //printf("iteration %d\n",i);
         *res += struData->ptrTab[i];
     }
 
@@ -107,19 +106,22 @@ void * threadSqMean (void* arg)
 {
     datatata *struData = (datatata*)arg;
 
-    float res = 0;
+    double* res;
+    res = (double*)malloc(sizeof(double));
+    *res = 0;
+
     float temp;
 
     for (size_t i = 1; i <= struData->tabSize; ++i)
     {
         temp = struData->ptrTab[i];
-        res += pow(temp,2);
+        *res += pow(temp,2);
     }
 
-    res = res/struData->tabSize;
-    res = sqrt(res);
+    *res = *res/struData->tabSize;
+    *res = sqrt(*res);
 
-    //printf("La moyenne quadratique vaut %f \n",res);
+    pthread_exit((void*)res);
 
     return NULL;
 
@@ -130,16 +132,19 @@ void * threadPowSum (void* arg)
 {
     datatata *struData = (datatata*)arg;
 
-    float res = 0;
+    double* res;
+    res = (double*)malloc(sizeof(double));
+    *res = 0;
+
     float temp;
 
     for (size_t i = 1; i <= struData->tabSize; ++i)
     {
         temp = struData->ptrTab[i];
-        res += pow(temp,3);
+        *res += pow(temp,3);
     }
 
-    //printf("La somme des cubes vaut %f \n",res);
+    pthread_exit((void*)res);
 
     return NULL;
 
@@ -149,108 +154,110 @@ void * threadPowSum (void* arg)
 
 int main(void)
 {
+    FILE *f = fopen("tempsEnParallele.txt","w");
+    if (f == NULL)
+    {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+
+
+
+
     // nombre d'itérations
     size_t nbIte=10;
 
-//    printf("Combien d'iterations du programme ? : ");
-//    scanf("%d",&nbIte);
+    int N = 20;
 
-
-    int N;
-    printf("Valeur de N ? : ");
-    scanf("%d",&N);
-
-    //float iniTime = time(NULL);
-
-    clock_t start, end;
-
-    start = clock();
-
-
-
-    for (size_t y = 0 ; y < nbIte ; ++y)
+    while (N <= 300)
     {
-        srand(time(NULL));
+        //    printf("Valeur de N ? : ");
+        //    scanf("%d",&N);
+
+            //float iniTime = time(NULL);
+
+            clock_t start, end;
+
+            start = clock();
 
 
-        int i = 1;
-        int j = i;
-        float T [N];
 
-        //int limite = enne;
-        //float scube;
-
-        //double marit, mquad;
-
-        // trois threads par t
-        int NB_THREADS = 3*N;
-        pthread_t threads [NB_THREADS];
-
-        //argument pour threads
-        datatata stArgs;
-        stArgs.ptrTab=T;
-        stArgs.tabSize=i;
-
-        while (i <= N)
-        {
-            //float temp;
-            //printf("Entrez la valeur %d : ",i);
-            //scanf("%f",&T[i]);
-            T[i] = rand();
-
-            stArgs.ptrTab=T;
-            stArgs.tabSize=i;
-
-            double* moyenneUnPeu;
-
-#if 0
-
-            marit = MARIT(T,i);
-            mquad = MQUAD(T,i);
-            scube = SCUB(T,i);
-
-
-            printf("La moyenne vaut %f \n",marit);
-            printf("La moyenne quadratique vaut %f \n",mquad);
-            printf("La somme des cubes vaut %f \n",scube);
-#endif
-
-            if (pthread_create(&threads[j], NULL, threadMean, (void*)&stArgs) != 0)
+            for (size_t y = 0 ; y < nbIte ; ++y)
             {
-              fprintf(stderr, "error: Cannot create thread # %d\n", i);
-              break;
+                srand(time(NULL));
+
+
+                int i = 1;
+                int j = i;
+                float T [N];
+
+                // trois threads par t
+                int NB_THREADS = 3*N;
+                pthread_t threads [NB_THREADS];
+
+                //argument pour threads
+                datatata stArgs;
+                stArgs.ptrTab=T;
+                stArgs.tabSize=i;
+
+
+                double* moyenne;
+                double* moyQuad;
+                double* somCube;
+
+
+                while (i <= N)
+                {
+
+                    T[i] = rand();
+
+                    stArgs.ptrTab=T;
+                    stArgs.tabSize=i;
+
+                    if (pthread_create(&threads[j], NULL, threadMean, (void*)&stArgs) != 0)
+                    {
+                      fprintf(stderr, "error: Cannot create thread # %d\n", i);
+                      break;
+                    }
+                    if (pthread_create(&threads[j+1], NULL, threadSqMean, (void*)&stArgs) != 0)
+                    {
+                      fprintf(stderr, "error: Cannot create thread # %d\n", i);
+                      break;
+                    }
+                    if (pthread_create(&threads[j+2], NULL, threadPowSum, (void*)&stArgs) != 0)
+                    {
+                      fprintf(stderr, "error: Cannot create thread # %d\n", i);
+                      break;
+                    }
+
+                    pthread_join(threads[j],(void**)&moyenne);
+                    pthread_join(threads[j+1],(void**)&moyQuad);
+                    pthread_join(threads[j+2],(void**)&somCube);
+
+                    printf("La moyenne vaut %f \n",*moyenne);
+                    printf("La moyenne quadratique vaut %f \n",*moyQuad);
+                    printf("La somme des cubes vaut %f \n",*somCube);
+
+                    i++;
+                    j+=3;
+                }
+
+
+                //printf("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_\n");
+
+
             }
-//            if (pthread_create(&threads[i+1], NULL, threadSqMean, (void*)&stArgs) != 0)
-//            {
-//              fprintf(stderr, "error: Cannot create thread # %d\n", i);
-//              break;
-//            }
-//            if (pthread_create(&threads[i+2], NULL, threadPowSum, (void*)&stArgs) != 0)
-//            {
-//              fprintf(stderr, "error: Cannot create thread # %d\n", i);
-//              break;
-//            }
 
-            pthread_join(threads[i],(void**)&moyenneUnPeu);/*
-            pthread_join(threads[i+1],NULL);
-            pthread_join(threads[i+2],NULL);*/
+            end = clock();
 
-            printf("La moyenne vaut %f \n",*moyenneUnPeu);
+            float myDurationClock = (double)(end - start) / nbIte / CLOCKS_PER_SEC;
 
-            i++;
-            j+=3;
-        }
+            fprintf (f,"\n\nDuree moyenne sur %d iterations : %f secondes.\n\n", N, myDurationClock);
+
+            N+=20;
 
     }
-
-    end = clock();
-
-    //float endTime = time(NULL);
-    //float myDuration = (endTime - iniTime) / nbIte;
-
-    float myDurationClock = (double)(end - start) / nbIte / CLOCKS_PER_SEC;
-
-    printf ("\n\nDuree moyenne sur %d iterations : %f secondes.\n\n", N, myDurationClock);
+    fclose(f);
 
 }
 

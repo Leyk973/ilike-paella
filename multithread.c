@@ -200,6 +200,9 @@ int main(void)
                 stArgs.ptrTab=T;
                 stArgs.tabSize=i;
 
+                datatata stArgs2 = stArgs;
+                datatata stArgs3 = stArgs;
+
 
                 double* moyenne;
                 double* moyQuad;
@@ -219,12 +222,12 @@ int main(void)
                       fprintf(stderr, "error: Cannot create thread # %d\n", i);
                       break;
                     }
-                    if (pthread_create(&threads[j+1], NULL, threadSqMean, (void*)&stArgs) != 0)
+                    if (pthread_create(&threads[j+1], NULL, threadSqMean, (void*)&stArgs2) != 0)
                     {
                       fprintf(stderr, "error: Cannot create thread # %d\n", i);
                       break;
                     }
-                    if (pthread_create(&threads[j+2], NULL, threadPowSum, (void*)&stArgs) != 0)
+                    if (pthread_create(&threads[j+2], NULL, threadPowSum, (void*)&stArgs3) != 0)
                     {
                       fprintf(stderr, "error: Cannot create thread # %d\n", i);
                       break;

@@ -188,12 +188,12 @@ int main(void)
 
 
                 int i = 1;
-                int j = i;
+                //int j = i;
                 float T [N];
 
                 // trois threads par t
-                int NB_THREADS = 3*N;
-                pthread_t threads [NB_THREADS];
+                //int NB_THREADS = 3*N;
+                //pthread_t threads [NB_THREADS];
 
                 //argument pour threads
                 datatata stArgs;
@@ -217,32 +217,35 @@ int main(void)
                     stArgs.ptrTab=T;
                     stArgs.tabSize=i;
 
-                    if (pthread_create(&threads[j], NULL, threadMean, (void*)&stArgs) != 0)
+                    pthread_t t1,t2,t3;
+
+
+                    if (pthread_create(&t1, NULL, threadMean, (void*)&stArgs) != 0)
                     {
                       fprintf(stderr, "error: Cannot create thread # %d\n", i);
                       break;
                     }
-                    if (pthread_create(&threads[j+1], NULL, threadSqMean, (void*)&stArgs2) != 0)
+                    if (pthread_create(&t2, NULL, threadSqMean, (void*)&stArgs2) != 0)
                     {
                       fprintf(stderr, "error: Cannot create thread # %d\n", i);
                       break;
                     }
-                    if (pthread_create(&threads[j+2], NULL, threadPowSum, (void*)&stArgs3) != 0)
+                    if (pthread_create(&t3, NULL, threadPowSum, (void*)&stArgs3) != 0)
                     {
                       fprintf(stderr, "error: Cannot create thread # %d\n", i);
                       break;
                     }
 
-                    pthread_join(threads[j],(void**)&moyenne);
-                    pthread_join(threads[j+1],(void**)&moyQuad);
-                    pthread_join(threads[j+2],(void**)&somCube);
+                    pthread_join(t1,(void**)&moyenne);
+                    pthread_join(t2,(void**)&moyQuad);
+                    pthread_join(t3,(void**)&somCube);
 
                     printf("La moyenne vaut %f \n",*moyenne);
                     printf("La moyenne quadratique vaut %f \n",*moyQuad);
                     printf("La somme des cubes vaut %f \n",*somCube);
 
                     i++;
-                    j+=3;
+                    //j+=3;
                 }
 
 

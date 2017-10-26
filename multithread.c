@@ -4,7 +4,7 @@
 #include <time.h> // clock
 #include <pthread.h>
 
-
+#if 0
 /**
  ** ptrTab = pointeur vers le tableau de nombres entré
  ** tabSize = nombre d'éléments dans le tableau
@@ -67,6 +67,9 @@ float SCUB (float * ptrTab, size_t tabSize)
     return res;
 
 }
+
+#endif
+
 
 // structure contenant les arguments pour le calcul du bazar
 // (tableau et taille du tableau rempli)
@@ -240,9 +243,9 @@ int main(void)
                     pthread_join(t2,(void**)&moyQuad);
                     pthread_join(t3,(void**)&somCube);
 
-                    printf("La moyenne vaut %f \n",*moyenne);
-                    printf("La moyenne quadratique vaut %f \n",*moyQuad);
-                    printf("La somme des cubes vaut %f \n",*somCube);
+                    //printf("La moyenne vaut %f \n",*moyenne);
+                    //printf("La moyenne quadratique vaut %f \n",*moyQuad);
+                    //printf("La somme des cubes vaut %f \n",*somCube);
 
                     i++;
                     //j+=3;
